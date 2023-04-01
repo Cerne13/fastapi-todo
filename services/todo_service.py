@@ -1,8 +1,10 @@
+from typing import Type
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from models import Todos
-from schemas.todos_schemas import Todo
+from schemas.todos_schemas import Todo, TodoList
 
 
 class TodoService:
@@ -21,16 +23,24 @@ class TodoService:
         return HTTPException(status_code=404, detail='Item not found')
 
     async def get_all_todos(self):
-        return self.db.query(Todos).all()
+        results = self.db.query(Todos).all()
+        return TodoList(
+            total=len(results),
+            todos=[result.__dict__ for result in results]
+        )
 
-    async def get_todos_by_user(self, user_id: int):
-        return self.db.query(Todos).filter(Todos.user_id == user_id).all()
+    async def get_todos_by_user(self, user_id: int) -> TodoList:
+        results = self.db.query(Todos).filter(Todos.user_id == user_id).all()
+        return TodoList(
+            total=len(results),
+            todos=[result.__dict__ for result in results]
+        )
 
-    async def get_one_todo(self, todo_id: int, user_id: int):
+    async def get_one_todo(self, todo_id: int, user_id: int) -> Todo:
         todo_model = self.db.query(Todos).filter(Todos.id == todo_id).filter(Todos.user_id == user_id).first()
 
         if todo_model is not None:
-            return todo_model
+            return Todo(**todo_model.__dict__)
         raise self.http_exception_404()
 
     async def create_todo(self, todo: Todo, user_id: int):

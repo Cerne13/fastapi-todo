@@ -48,25 +48,25 @@ async def get_user_by_query_param_id(user_id: int, db: Session = Depends(get_db)
 @router.put('/user/password')
 async def update_user_password(
         user_verification: UserVerification,
-        user: dict = Depends(get_current_user),
+        user: UserResponse = Depends(get_current_user),
         db: Session = Depends(get_db)
 ) -> str:
     if user is None:
         raise AuthService.get_user_exception()
 
     user_service = UserService(db=db)
-    result = await user_service.update_user_password(user_id=user.get('id'), user_verification=user_verification)
+    result = await user_service.update_user_password(user_id=user.id, user_verification=user_verification)
     return result
 
 
 @router.delete('/user')
 async def delete_user(
-        user: dict = Depends(get_current_user),
+        user: UserResponse = Depends(get_current_user),
         db: Session = Depends(get_db)
 ) -> str:
     if user is None:
         raise AuthService.get_user_exception()
 
     user_service = UserService(db=db)
-    result = await user_service.delete_user(user_id=user.get('id'))
+    result = await user_service.delete_user(user_id=user.id)
     return result

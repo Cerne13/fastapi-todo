@@ -8,3 +8,8 @@ class Todo(BaseModel):
     description: Optional[str]
     priority: int = Field(ge=1, le=10, description='Priority must be from 1 to 10')
     complete: bool = Field(default=False)
+
+
+class TodoList(BaseModel):
+    total: int
+    todos: list[Todo]

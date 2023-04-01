@@ -1,4 +1,5 @@
 import sys
+from typing import Type
 
 from routes.auth import get_current_user
 from schemas.user_schemas import UserResponse
@@ -12,7 +13,7 @@ from sqlalchemy.orm import Session
 from database import engine, get_db
 from services.auth_service import AuthService
 import models
-from schemas.todos_schemas import Todo
+from schemas.todos_schemas import Todo, TodoList
 
 router = APIRouter(
     prefix='/todos',
@@ -25,19 +26,18 @@ router = APIRouter(
 models.Base.metadata.create_all(bind=engine)
 
 
-@router.get('/')
-async def read_all(db: Session = Depends(get_db)):
+@router.get('/', response_model=TodoList)
+async def read_all(db: Session = Depends(get_db)) -> TodoList:
     service = TodoService(db=db)
     result = await service.get_all_todos()
     return result
 
 
-
-@router.get('/user')
+@router.get('/user', response_model=TodoList)
 async def read_all_by_user(
         user: UserResponse = Depends(get_current_user),
         db: Session = Depends(get_db)
-):
+) -> TodoList:
     if user is None:
         raise AuthService.get_user_exception()
 
@@ -46,12 +46,12 @@ async def read_all_by_user(
     return result
 
 
-@router.get('/{todo_id}')
+@router.get('/{todo_id}', response_model=Todo)
 async def read_one_todo(
         todo_id: int,
         user: UserResponse = Depends(get_current_user),
         db: Session = Depends(get_db)
-):
+) -> Todo:
     if user is None:
         raise AuthService.get_user_exception()
 
