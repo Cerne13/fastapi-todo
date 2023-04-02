@@ -7,8 +7,7 @@ sys.path.append('..')
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
-import models
-from database import engine, get_db
+from database import get_db
 from routes.auth import get_current_user
 from schemas.user_schemas import UserVerification, UserResponse
 from services.user_services import UserService
@@ -21,7 +20,7 @@ router = APIRouter(
     }
 )
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 
 @router.get('/', response_model=list[UserResponse])

@@ -1,5 +1,4 @@
 import sys
-from typing import Type
 
 from routes.auth import get_current_user
 from schemas.user_schemas import UserResponse
@@ -12,7 +11,6 @@ from sqlalchemy.orm import Session
 
 from database import engine, get_db
 from services.auth_service import AuthService
-import models
 from schemas.todos_schemas import Todo, TodoList
 
 router = APIRouter(
@@ -23,7 +21,7 @@ router = APIRouter(
     }
 )
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 
 @router.get('/', response_model=TodoList)

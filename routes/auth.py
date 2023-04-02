@@ -5,16 +5,12 @@ from services.auth_service import AuthService, get_current_user_dependency
 
 sys.path.append('..')
 
-from fastapi import Depends, HTTPException, status, APIRouter
+from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from database import engine, get_db
-from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
-
-import models
 from schemas.user_schemas import CreateUser, UserResponse
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 router = APIRouter(
     prefix='/auth',

@@ -1,9 +1,7 @@
-from typing import Type
-
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from models import Todos
+from models.models import Todos
 from schemas.todos_schemas import Todo, TodoList
 
 
@@ -56,10 +54,7 @@ class TodoService:
         return self.successful_response(201)
 
     async def update_todo(self, todo_id: int, todo: Todo, user_id: int):
-        todo_model = self.db.query(Todos) \
-            .filter(Todos.id == todo_id) \
-            .filter(Todos.user_id == user_id) \
-            .first()
+        todo_model = self.db.query(Todos).filter(Todos.id == todo_id, Todos.user_id == user_id).first()
 
         if todo_model is None:
             raise self.http_exception_404()
@@ -75,10 +70,7 @@ class TodoService:
         return self.successful_response(200)
 
     async def delete_todo(self, todo_id: int, user_id: int):
-        todo_model = self.db.query(Todos) \
-            .filter(Todos.id == todo_id) \
-            .filter(Todos.user_id == user_id) \
-            .first()
+        todo_model = self.db.query(Todos).filter(Todos.id == todo_id, Todos.user_id == user_id).first()
 
         if todo_model is None:
             raise self.http_exception_404()

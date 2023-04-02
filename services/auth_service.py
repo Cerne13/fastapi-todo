@@ -10,7 +10,7 @@ from jose import jwt, JWTError
 from starlette import status
 
 from database import get_db
-from models import Users
+from models.models import Users
 from schemas.auth_schemas import Token
 from schemas.user_schemas import CreateUser, UserResponse
 
@@ -107,7 +107,8 @@ class AuthService:
             first_name=create_user.first_name,
             last_name=create_user.last_name,
             hashed_password=self.get_password_hash(create_user.password),
-            is_active=True
+            is_active=True,
+            phone_number=create_user.phone_number
         )
 
         self.db.add(create_user_model)

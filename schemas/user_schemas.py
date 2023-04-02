@@ -9,6 +9,7 @@ class CreateUser(BaseModel):
     first_name: str
     last_name: str
     password: str
+    phone_number: str
 
 
 class UserResponse(BaseModel):
@@ -17,6 +18,7 @@ class UserResponse(BaseModel):
     email: Optional[str]
     first_name: str
     last_name: str
+    phone_number: Optional[str]
 
 
 class UserVerification(BaseModel):
