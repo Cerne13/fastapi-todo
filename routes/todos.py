@@ -6,10 +6,12 @@ from services.todo_service import TodoService
 
 sys.path.append('..')
 
-from fastapi import Depends, APIRouter
+from fastapi import Depends, APIRouter, Request
 from sqlalchemy.orm import Session
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
-from database import engine, get_db
+from database import get_db
 from services.auth_service import AuthService
 from schemas.todos_schemas import Todo, TodoList
 
@@ -21,7 +23,14 @@ router = APIRouter(
     }
 )
 
+templates = Jinja2Templates(directory='templates')
+
 # models.Base.metadata.create_all(bind=engine)
+
+
+@router.get('/test')
+async def test_page(request: Request):
+    return templates.TemplateResponse('home.html', {'request': request})
 
 
 @router.get('/', response_model=TodoList)

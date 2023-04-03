@@ -1,21 +1,16 @@
 import sys
 
-from services.address_service import AddressService
-
 sys.path.append('..')
 
-from models.models import Users
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from database import get_db
 from routes.auth import get_current_user
 from schemas.address_schemas import AddressSchema
 from schemas.user_schemas import UserResponse
-
-from fastapi import APIRouter, Depends
-
-from models.models import Address
-from sqlalchemy.orm import Session
-
 from services.auth_service import AuthService
-from database import get_db
+from services.address_service import AddressService
 
 router = APIRouter(
     prefix='/address',
