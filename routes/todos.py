@@ -34,26 +34,6 @@ async def home_page(request: Request):
     return templates.TemplateResponse('home.html', {'request': request})
 
 
-@router.get('/add_todo')
-async def add_todo_page(request: Request):
-    return templates.TemplateResponse('add-todo.html', {'request': request})
-
-
-@router.get('/edit_todo')
-async def add_todo_page(request: Request):
-    return templates.TemplateResponse('edit-todo.html', {'request': request})
-
-
-@router.get('/log_in')
-async def login_page(request: Request):
-    return templates.TemplateResponse('login.html', {'request': request})
-
-
-@router.get('/register')
-async def login_page(request: Request):
-    return templates.TemplateResponse('register.html', {'request': request})
-
-
 @router.get('/', response_model=TodoList)
 async def read_all(db: Session = Depends(get_db)) -> TodoList:
     service = TodoService(db=db)
