@@ -89,7 +89,8 @@ class AuthService:
 
     def decode_access_token(self, token: str) -> dict:
         try:
-            decoded_token = jwt.decode(token, self.secret, algorithms=[self.algorithm])
+            decoded_token = jwt.decode(
+                token, self.secret, algorithms=[self.algorithm])
             return decoded_token if decoded_token["exp"] >= int(time.time()) else None
         except:
             return {}
@@ -137,7 +138,8 @@ class AuthService:
             if not username:
                 raise self.get_user_exception()
 
-            user = self.db.query(Users).filter(Users.username == username).first()
+            user = self.db.query(Users).filter(
+                Users.username == username).first()
             if not user:
                 raise self.get_user_exception()
 
