@@ -1,11 +1,9 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 
 class CreateUser(BaseModel):
     username: str
-    email: Optional[str]
+    email: str | None = None
     first_name: str
     last_name: str
     password: str
@@ -15,10 +13,10 @@ class CreateUser(BaseModel):
 class UserResponse(BaseModel):
     id: int
     username: str
-    email: Optional[str]
+    email: str | None = None
     first_name: str
     last_name: str
-    phone_number: Optional[str]
+    phone_number: str | None = None
 
 
 class UserVerification(BaseModel):

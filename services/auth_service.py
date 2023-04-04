@@ -172,6 +172,7 @@ class AuthService:
             user = self.db.query(Users).filter(Users.username == username).first()
 
             if not username:
+                msg = 'Authorization credentials fail'
                 response = templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
                 response.delete_cookie('access_token')
                 return response
