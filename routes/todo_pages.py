@@ -1,4 +1,5 @@
 import sys
+from typing import Optional
 
 sys.path.append('..')
 
@@ -10,11 +11,6 @@ from starlette.responses import RedirectResponse
 from starlette import status
 
 from database import get_db
-from services.auth_service import AuthService
-from schemas.todos_schemas import Todo, TodoList
-from routes.auth import get_current_user
-from schemas.user_schemas import UserResponse
-from services.todo_service import TodoService
 from models.models import Todos
 
 router = APIRouter(
@@ -113,14 +109,3 @@ async def complete_todo(request: Request, todo_id: int, db: Session = Depends(ge
     db.add(todo)
     db.commit()
     return RedirectResponse(url='/todo_pages', status_code=status.HTTP_302_FOUND)
-
-
-# Auth for todos front
-@router.get('/login', response_class=HTMLResponse)
-async def login(request: Request):
-    return templates.TemplateResponse('login.html', context={'request': request})
-
-
-@router.get('/register', response_class=HTMLResponse)
-async def register(request: Request):
-    return templates.TemplateResponse('register.html', context={'request': request})

@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 import time
 from typing import Optional
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Response
 from fastapi.security import HTTPBearer
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -117,20 +117,18 @@ class AuthService:
 
         return {'status': 'Success'}
 
-    async def login_for_access_token(self, username: str, password: str):
+    async def login_for_access_token(self, response: Response, username: str, password: str) -> bool:
         user = self.authenticate_user(username=username, password=password)
-
         if not user:
-            raise self.token_exception()
+            return False
 
-        token_expires = timedelta(minutes=20)
-
+        token_expires = timedelta(minutes=60)
         token = self.create_access_token(
             username=username,
             expires_delta=token_expires
         )
-
-        return {"token": token}
+        response.set_cookie(key='access_token', value=token, httponly=True)
+        return True
 
     async def get_current_user(self, token: Optional[str] = Depends(bearer)) -> UserResponse:
         try:
