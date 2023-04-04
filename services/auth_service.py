@@ -172,11 +172,13 @@ class AuthService:
             user = self.db.query(Users).filter(Users.username == username).first()
 
             if not username:
-                return None
+                response = templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
+                response.delete_cookie('access_token')
+                return response
             return {'username': username, 'id': user.id}
 
         except JWTError:
-            raise AuthService.get_user_exception()
+            raise HTTPException(status_code=404, detail='User not found')
 
     async def login_user(self, request: Request):
         try:

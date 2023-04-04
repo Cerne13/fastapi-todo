@@ -78,7 +78,7 @@ async def login_user(request: Request, db: Session = Depends(get_db)):
 
 
 @router.get('/logout', response_class=HTMLResponse)
-async def logout(request: Request):
+async def log_out(request: Request):
     msg = "Logout successful"
     response = templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
     response.delete_cookie('access_token')

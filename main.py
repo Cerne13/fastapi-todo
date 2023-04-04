@@ -1,12 +1,19 @@
 from fastapi import FastAPI, HTTPException
 from starlette.requests import Request
-from starlette.responses import RedirectResponse
 from starlette.staticfiles import StaticFiles
+from starlette import status
+from starlette.responses import RedirectResponse
 
 from routes import auth, todos, users, address, todo_pages
 
 app = FastAPI(title='Todo App')
 app.mount('/static', StaticFiles(directory='static'), name='static')
+
+
+@app.get('/')
+async def root():
+    return RedirectResponse('/todo_pages', status_code=status.HTTP_302_FOUND)
+
 
 app.include_router(auth.router)
 app.include_router(todos.router)
