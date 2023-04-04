@@ -5,32 +5,37 @@
   <div class="card">
     <div class="card-header">Let's edit your todo</div>
     <div class="card-body">
-      <form>
+      <form method="post">
         <div class="form-group">
           <label>Title</label>
-          <input class="form-control" type="text" name="title" required>
+          <input class="form-control" type="text" name="title" value="{{ todo.title }}" required>
         </div>
         <div class="form-group">
           <label>Description</label>
-          <textarea name="description" class="form-control" rows="3" required></textarea>
+          <textarea name="description" class="form-control" rows="3" required>{{ todo.description }}</textarea>
         </div>
         <div class="form-group">
           <label>Priority</label>
           <select name="priority" class="form-control">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
+            <option {% if todo.priority ==1 %} selected="selected" {% endif %}>1</option>
+            <option {% if todo.priority ==2 %} selected="selected" {% endif %}>2</option>
+            <option {% if todo.priority ==3 %} selected="selected" {% endif %}>3</option>
+            <option {% if todo.priority ==4 %} selected="selected" {% endif %}>4</option>
+            <option {% if todo.priority ==5 %} selected="selected" {% endif %}>5</option>
+            <option {% if todo.priority ==6 %} selected="selected" {% endif %}>6</option>
+            <option {% if todo.priority ==7 %} selected="selected" {% endif %}>7</option>
+            <option {% if todo.priority ==8 %} selected="selected" {% endif %}>8</option>
+            <option {% if todo.priority ==9 %} selected="selected" {% endif %}>9</option>
+            <option {% if todo.priority ==10 %} selected="selected" {% endif %}>10</option>
           </select>
         </div>
         <button type="submit" class="btn btn-primary">Edit todo</button>
-        <button type="button" class="btn btn-danger">Delete todo</button>
+        <button
+                type="button"
+                class="btn btn-danger"
+                onclick="window.location.href='/todo_pages/delete/{{ todo.id }}'"
+        >
+          Delete todo</button>
       </form>
     </div>
   </div>

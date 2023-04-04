@@ -18,34 +18,41 @@
         </thead>
 
         <tbody>
+        {% for todo in todos %}
+
+        {% if not todo.complete%}
         <tr class="pointer">
-          <td>1</td>
-          <td>Take out the trash</td>
+          <td>{{ loop.index }}</td>
+          <td>{{ todo.title }}</td>
           <td>
-            <button type="button" class="btn btn-success">Complete</button>
-            <button type="button" class="btn btn-danger">Delete</button>
+            <button type="button" class="btn btn-success" onclick="window.location.href='complete/{{ todo.id }}'">
+              Complete
+            </button>
+            <button type="button" class="btn btn-info" onclick="window.location.href='edit-todo/{{todo.id}}'">
+              Edit
+            </button>
           </td>
         </tr>
 
-        <tr class="pointer">
-          <td>1</td>
-          <td>Take out the trash</td>
+        {% else %}
+        <tr class="pointer alert alert-success">
+          <td>{{ loop.index }}</td>
+          <td class="strike-through-td">{{ todo.title }}</td>
           <td>
-            <button type="button" class="btn btn-success">Complete</button>
-            <button type="button" class="btn btn-danger">Delete</button>
+            <button type="button" class="btn btn-warning" onclick="window.location.href='complete/{{ todo.id }}'">
+             &nbsp;&nbsp; Undo &nbsp;&nbsp;
+            </button>
+            <button type="button" class="btn btn-info" onclick="window.location.href='edit-todo/{{todo.id}}'">
+              Edit
+            </button>
           </td>
         </tr>
+        {% endif %}
 
-        <tr class="pointer">
-          <td>1</td>
-          <td>Take out the trash</td>
-          <td>
-            <button type="button" class="btn btn-success">Complete</button>
-            <button type="button" class="btn btn-danger">Delete</button>
-          </td>
-        </tr>
+        {% endfor %}
         </tbody>
       </table>
+      <a href="add-todo" class="btn btn-primary">Create a New Todo</a>
     </div>
   </div>
 </div>
