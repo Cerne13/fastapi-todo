@@ -8,6 +8,8 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from starlette import status
+from starlette.responses import RedirectResponse
+from starlette.templating import Jinja2Templates
 
 from database import get_db
 from models.models import Users
@@ -19,6 +21,19 @@ ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 bearer = HTTPBearer()
+templates = Jinja2Templates(directory='templates')
+
+
+class LoginForm:
+    def __init__(self, request: Request):
+        self.request: Request = request
+        self.username: Optional[str] = None
+        self.password: Optional[str] = None
+
+    async def create_oauth_form(self):
+        form = await self.request.form()
+        self.username = form.get('email')
+        self.password = form.get('password')
 
 
 async def get_current_user_dependency(
@@ -162,3 +177,44 @@ class AuthService:
 
         except JWTError:
             raise AuthService.get_user_exception()
+
+    async def login_user(self, request: Request):
+        try:
+            form = LoginForm(request=request)
+            await form.create_oauth_form()
+            response = RedirectResponse(url='/todo_pages', status_code=status.HTTP_302_FOUND)
+
+            validate_user_cookie = await self.login_for_access_token(
+                response=response,
+                username=form.username,
+                password=form.password
+            )
+            if not validate_user_cookie:
+                msg = 'Incorrect user credentials.'
+                return templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
+            return response
+        except HTTPException:
+            msg = 'Authentication error happened'
+            return templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
+
+    async def register_user(self, request: Request, user: dict):
+        validation1 = self.db.query(Users).filter(Users.username == user.get('username')).first()
+        validation2 = self.db.query(Users).filter(Users.email == user.get('email')).first()
+
+        if validation1 is not None or validation2 is not None or user.get('password') != user.get('password2'):
+            msg = 'Invalid registration request'
+            return templates.TemplateResponse('register.html', context={'request': request, 'message': msg})
+
+        user_model = Users()
+        user_model.email=user.get('email')
+        user_model.username=user.get('username')
+        user_model.first_name=user.get('first_name')
+        user_model.last_name=user.get('last_name')
+        user_model.hashed_password = self.get_password_hash(user.get('password'))
+        user_model.is_active = True
+
+        self.db.add(user_model)
+        self.db.commit()
+
+        msg = 'User successfully created'
+        return templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
