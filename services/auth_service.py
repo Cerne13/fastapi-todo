@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 import time
 from typing import Optional
 
-from fastapi import Depends, HTTPException, Response
+from fastapi import Depends, HTTPException, Response, Request
 from fastapi.security import HTTPBearer
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -145,3 +145,20 @@ class AuthService:
 
         except JWTError:
             raise self.get_user_exception()
+
+    # For front
+    async def get_current_user_http(self, request: Request):
+        try:
+            token = request.cookies.get("access_token")
+            if token is None:
+                return None
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            username = payload.get('sub')
+            user = self.db.query(Users).filter(Users.username == username).first()
+
+            if not username:
+                return None
+            return {'username': username, 'id': user.id}
+
+        except JWTError:
+            raise AuthService.get_user_exception()

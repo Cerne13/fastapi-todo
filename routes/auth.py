@@ -10,11 +10,13 @@ from starlette.requests import Request
 from fastapi.responses import HTMLResponse
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
+from jose import jwt, JWTError
 
 from database import get_db
 from schemas.user_schemas import CreateUser, UserResponse
 from schemas.auth_schemas import SignInRequest
-from services.auth_service import AuthService, get_current_user_dependency
+from services.auth_service import AuthService, get_current_user_dependency, SECRET_KEY, ALGORITHM
+from models.models import Users
 
 router = APIRouter(
     prefix='/auth',
@@ -67,10 +69,22 @@ async def get_current_user(
     return user
 
 
+@router.get('/current_user/')
+async def get_current_user_http(request: Request, db: Session = Depends(get_db)):
+    service = AuthService(db=db)
+    result = await service.get_current_user_http(request=request)
+    return result
+
+
 # For front
 @router.get('/login', response_class=HTMLResponse)
 async def login(request: Request):
     return templates.TemplateResponse('login.html', context={'request': request})
+
+
+@router.get("/", response_class=HTMLResponse)
+async def authentication_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
 
 @router.post('/', response_class=HTMLResponse)
@@ -93,6 +107,7 @@ async def login_user(request: Request, db: Session = Depends(get_db)):
     except HTTPException:
         msg = 'Authentication error happened'
         return templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
+
 
 @router.get('/register', response_class=HTMLResponse)
 async def register(request: Request):

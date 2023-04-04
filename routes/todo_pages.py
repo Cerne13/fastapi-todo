@@ -1,5 +1,6 @@
 import sys
-from typing import Optional
+
+from routes.auth import get_current_user_http
 
 sys.path.append('..')
 
@@ -26,13 +27,21 @@ templates = Jinja2Templates(directory='templates')
 
 @router.get('/', response_class=HTMLResponse)
 async def get_all_by_user(request: Request, db: Session = Depends(get_db)):
-    todos = db.query(Todos).filter(Todos.user_id == 1).all()
+    user = await get_current_user_http(request=request, db=db)
+    if user is None:
+        return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+
+    todos = db.query(Todos).filter(Todos.user_id == user.get('id')).all()
 
     return templates.TemplateResponse('home.html', context={'request': request, 'todos': todos})
 
 
 @router.get('/add-todo', response_class=HTMLResponse)
-async def add_todo(request: Request):
+async def add_todo(request: Request, db: Session = Depends(get_db)):
+    user = await get_current_user_http(request=request, db=db)
+    if user is None:
+        return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+
     return templates.TemplateResponse('add-todo.html', context={'request': request})
 
 
@@ -44,12 +53,16 @@ async def create_todo(
         priority: int = Form(...),
         db: Session = Depends(get_db)
 ):
+    user = await get_current_user_http(request=request, db=db)
+    if user is None:
+        return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+
     todo_model = Todos(
         title=title,
         description=description,
         priority=priority,
         complete=False,
-        user_id=1
+        user_id=user.get('id')
     )
 
     db.add(todo_model)
@@ -64,6 +77,10 @@ async def edit_todo(
         todo_id: int,
         db: Session = Depends(get_db)
 ):
+    user = await get_current_user_http(request=request, db=db)
+    if user is None:
+        return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+
     todo = db.query(Todos).filter(Todos.id == todo_id).first()
     return templates.TemplateResponse('edit-todo.html', context={'request': request, 'todo': todo})
 
@@ -77,6 +94,10 @@ async def edit_todo_commit(
         priority: int = Form(...),
         db: Session = Depends(get_db)
 ) -> RedirectResponse:
+    user = await get_current_user_http(request=request, db=db)
+    if user is None:
+        return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+
     todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
     todo_model.title = title
     todo_model.description = description
@@ -89,9 +110,13 @@ async def edit_todo_commit(
 
 @router.get('/delete/{todo_id}', response_class=HTMLResponse)
 async def delete_todo(request: Request, todo_id: int, db: Session = Depends(get_db)) -> RedirectResponse:
+    user = await get_current_user_http(request=request, db=db)
+    if user is None:
+        return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+
     todo_model = db.query(Todos).filter(
         Todos.id == todo_id,
-        Todos.user_id == 1
+        Todos.user_id == user.get('id')
     ).first()
 
     if todo_model is None:
@@ -104,6 +129,10 @@ async def delete_todo(request: Request, todo_id: int, db: Session = Depends(get_
 
 @router.get('/complete/{todo_id}', response_class=HTMLResponse)
 async def complete_todo(request: Request, todo_id: int, db: Session = Depends(get_db)) -> RedirectResponse:
+    user = await get_current_user_http(request=request, db=db)
+    if user is None:
+        return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+
     todo = db.query(Todos).filter(Todos.id == todo_id).first()
     todo.complete = not todo.complete
     db.add(todo)
