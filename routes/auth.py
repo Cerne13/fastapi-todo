@@ -2,7 +2,7 @@ import sys
 
 sys.path.append('..')
 
-from fastapi import Depends, APIRouter, Response, HTTPException
+from fastapi import Depends, APIRouter, Response, HTTPException, Form
 from sqlalchemy.orm import Session
 from typing import Optional
 from starlette import status
@@ -109,6 +109,47 @@ async def login_user(request: Request, db: Session = Depends(get_db)):
         return templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
 
 
+@router.get('/logout', response_class=HTMLResponse)
+async def logout(request: Request):
+    msg = "Logout successful"
+    response = templates.TemplateResponse('login.html', context={'request': request, 'message': msg})
+    response.delete_cookie('access_token')
+    return response
+
+
 @router.get('/register', response_class=HTMLResponse)
 async def register(request: Request):
     return templates.TemplateResponse('register.html', context={'request': request})
+
+
+@router.post('/register', response_class=HTMLResponse)
+async def register_user(
+        request: Request,
+        email: str = Form(...),
+        username: str = Form(...),
+        first_name: str = Form(...),
+        last_name: str = Form(...),
+        password: str = Form(...),
+        password2: str = Form(...),
+        db: Session = Depends(get_db)
+):
+    validation1 = db.query(Users).filter(Users.username == username).first()
+    validation2 = db.query(Users).filter(Users.email == email).first()
+
+    if validation1 is not None or validation2 is not None or password != password2:
+        msg = 'Invalid registration request'
+        return templates.TemplateResponse('register.html', context={'request': request, 'message': msg})
+
+    user_model = Users(
+        email=email,
+        username=username,
+        first_name=first_name,
+        last_name=last_name,
+        hashed_password=AuthService.get_password_hash(password),
+        is_active=True,
+    )
+    db.add(user_model)
+    db.commit()
+
+    msg = 'User successfully created'
+    return templates.TemplateResponse('login.html', context={'request': request, 'message': msg})

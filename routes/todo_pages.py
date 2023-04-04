@@ -33,7 +33,10 @@ async def get_all_by_user(request: Request, db: Session = Depends(get_db)):
 
     todos = db.query(Todos).filter(Todos.user_id == user.get('id')).all()
 
-    return templates.TemplateResponse('home.html', context={'request': request, 'todos': todos})
+    return templates.TemplateResponse(
+        'home.html',
+        context={'request': request, 'todos': todos, 'user': user}
+    )
 
 
 @router.get('/add-todo', response_class=HTMLResponse)
@@ -42,7 +45,7 @@ async def add_todo(request: Request, db: Session = Depends(get_db)):
     if user is None:
         return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
 
-    return templates.TemplateResponse('add-todo.html', context={'request': request})
+    return templates.TemplateResponse('add-todo.html', context={'request': request, 'user': user})
 
 
 @router.post('/add-todo', response_class=HTMLResponse)
@@ -82,7 +85,7 @@ async def edit_todo(
         return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
 
     todo = db.query(Todos).filter(Todos.id == todo_id).first()
-    return templates.TemplateResponse('edit-todo.html', context={'request': request, 'todo': todo})
+    return templates.TemplateResponse('edit-todo.html', context={'request': request, 'todo': todo, 'user': user})
 
 
 @router.post('/edit-todo/{todo_id}', response_class=HTMLResponse)

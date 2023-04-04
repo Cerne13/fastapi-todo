@@ -5,7 +5,14 @@
   <div class="card">
     <div class="card-header">Register</div>
     <div class="card-body">
-      <form>
+      <form method="post" action="/auth/register">
+
+        {% if message %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+        {% endif %}
+
         <div class="form-row">
           <div class="form-group col-md-6">
             <label>Email</label>
@@ -41,7 +48,7 @@
       </form>
     </div>
     <div class="card-footer text-muted">
-      <a href="#">Already registered?</a>
+      <a href="/auth">Already registered?</a>
     </div>
   </div>
 </div>
