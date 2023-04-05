@@ -22,6 +22,6 @@ app.include_router(address.router)
 app.include_router(todo_pages.router)
 
 
-@app.exception_handler(404)
-async def not_found_exception_handler(request: Request, exc: HTTPException):
-    return RedirectResponse('https://fastapi.tiangolo.com')
+# @app.exception_handler(404)
+# async def not_found_exception_handler(request: Request, exc: HTTPException):
+#     return RedirectResponse('https://fastapi.tiangolo.com')
