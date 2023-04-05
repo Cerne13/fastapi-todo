@@ -29,7 +29,9 @@ templates = Jinja2Templates(directory='templates')
 async def get_all_by_user(request: Request, db: Session = Depends(get_db)):
     user = await get_current_user_http(request=request, db=db)
     if user is None:
-        return RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+        response = RedirectResponse('/auth', status_code=status.HTTP_302_FOUND)
+        response.delete_cookie('access_token')
+        return response
 
     todos = db.query(Todos).filter(Todos.user_id == user.get('id')).all()
 

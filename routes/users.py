@@ -1,7 +1,5 @@
 import sys
 
-from services.auth_service import AuthService
-
 sys.path.append('..')
 
 from fastapi import Depends, APIRouter
@@ -11,6 +9,7 @@ from database import get_db
 from routes.auth import get_current_user
 from schemas.user_schemas import UserVerification, UserResponse
 from services.user_services import UserService
+from services.auth_service import AuthService
 
 router = APIRouter(
     prefix='/users',

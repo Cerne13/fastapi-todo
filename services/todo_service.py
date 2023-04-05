@@ -42,13 +42,7 @@ class TodoService:
         raise self.http_exception_404()
 
     async def create_todo(self, todo: Todo, user_id: int):
-        todo_model = Todos(
-            title=todo.title,
-            description=todo.description,
-            priority=todo.priority,
-            complete=todo.complete,
-            user_id=user_id
-        )
+        todo_model = Todos(**todo.dict(), user_id=user_id)
         self.db.add(todo_model)
         self.db.commit()
         return self.successful_response(201)
